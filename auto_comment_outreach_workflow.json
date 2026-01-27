@@ -1,0 +1,266 @@
+[
+    {
+        "name": "Tâm Thịnh - Auto Comment Outreach",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "hours",
+                                "interval": 2
+                            }
+                        ]
+                    }
+                },
+                "id": "schedule-trigger",
+                "name": "Schedule Trigger (Every 2h)",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "authentication": "serviceAccount",
+                    "resource": "sheet",
+                    "operation": "read",
+                    "sheetId": "={\"mode\":\"list\",\"value\":\"1HdvoIB0fBMDoJZh47sBEqDQsnEBGsH7kB8J03RJXXqo\"}",
+                    "range": "Outreach Targets!A:F",
+                    "options": {}
+                },
+                "id": "read-sheets",
+                "name": "Read Target URLs from Sheets",
+                "type": "n8n-nodes-base.googleSheets",
+                "typeVersion": 4,
+                "position": [
+                    250,
+                    0
+                ],
+                "credentials": {
+                    "googleSheetsApi": {
+                        "id": "SERVICE_ACCOUNT_CREDENTIAL_ID"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "string": [
+                            {
+                                "value1": "={{$json['Đã comment?']}}",
+                                "operation": "notEqual",
+                                "value2": "Rồi"
+                            }
+                        ]
+                    }
+                },
+                "id": "filter-unprocessed",
+                "name": "Filter Chưa Comment",
+                "type": "n8n-nodes-base.filter",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "batchSize": 1,
+                    "options": {}
+                },
+                "id": "loop-items",
+                "name": "Loop Over Items",
+                "type": "n8n-nodes-base.splitInBatches",
+                "typeVersion": 3,
+                "position": [
+                    750,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "prompt": "={{ '# Vai trò\nBạn là chuyên gia tư vấn bằng lái xe, đang GIÚP ĐỠ người khác trên Facebook Groups/Posts.\n\n# Bài đăng gốc\n\"' + $json['Nội dung gốc'] + '\"\n\n# URL\n' + $json['URL'] + '\n\n# Nhiệm vụ\nViết 1 comment để:\n1. Thấu hiểu vấn đề/nỗi đau của họ\n2. Cho 1-2 TIPS/INSIGHTS hữu ích (MIỄN PHÍ, không quảng cáo)\n3. Cuối cùng MỚI nhẹ nhàng mention Tâm Thịnh (nếu phù hợp)\n\n# Quy tắc QUAN TRỌNG\n- Tone: Bạn bè, nhiệt tình, chân thành\n- Độ dài: 3-5 dòng\n- KHÔNG bán hàng trực tiếp\n- KHÔNG spam \"inbox ngay\"\n- Phải tự nhiên như người thật\n- Sử dụng icon: 💪, ✨, 🚗, 🛵, 😊\n\n# Chiến lược Tâm lý\n- **Reciprocity:** Cho giá trị trước (80% content), mention sau (20%)\n- **Social Proof:** Nếu phù hợp, nhắc \"nhiều bạn đã...\"\n- **Authority:** Thể hiện kiến thức chuyên môn\n\n# Ví dụ Structure\n```\n[Thấu hiểu vấn đề]\n[Cho 1-2 tips cụ thể]\n[Soft mention Tâm Thịnh - optional]\n```\n\n# Output\nCHỈ trả về NỘI DUNG comment (không có lời dẫn, không có markdown heading).\nComment phải tự nhiên như bạn đang thật sự giúp đỡ người đó.' }}",
+                    "options": {}
+                },
+                "id": "gemini-ai-comment",
+                "name": "Gemini AI - Soạn Comment",
+                "type": "n8n-nodes-base.googlePalmApi",
+                "typeVersion": 1,
+                "position": [
+                    1000,
+                    0
+                ],
+                "credentials": {
+                    "googlePalmApi": {
+                        "id": "uoq3we0wIvtAJqrD"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "amount": "={{Math.floor(Math.random() * 90) + 30}}",
+                    "unit": "seconds"
+                },
+                "id": "random-delay",
+                "name": "Random Delay (30-120s)",
+                "type": "n8n-nodes-base.wait",
+                "typeVersion": 1,
+                "position": [
+                    1250,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "httpRequestMethod": "POST",
+                    "node": "={{$json['URL'].split('/').pop()}}",
+                    "edge": "comments",
+                    "options": {
+                        "queryParameters": {
+                            "parameter": [
+                                {
+                                    "name": "message",
+                                    "value": "={{$json.text}}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "id": "post-comment",
+                "name": "Post Comment to Facebook",
+                "type": "n8n-nodes-base.facebookGraphApi",
+                "typeVersion": 1,
+                "position": [
+                    1500,
+                    0
+                ],
+                "credentials": {
+                    "facebookGraphApi": {
+                        "id": "gfPXpP5BXAjhAIk1"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "authentication": "serviceAccount",
+                    "resource": "sheet",
+                    "operation": "update",
+                    "sheetId": "={\"mode\":\"list\",\"value\":\"1HdvoIB0fBMDoJZh47sBEqDQsnEBGsH7kB8J03RJXXqo\"}",
+                    "range": "={{\"Outreach Targets!D\" + ($json['__row'] + 2)}}",
+                    "options": {}
+                },
+                "id": "update-sheets-status",
+                "name": "Update Sheets - Đã comment",
+                "type": "n8n-nodes-base.googleSheets",
+                "typeVersion": 4,
+                "position": [
+                    1750,
+                    0
+                ],
+                "credentials": {
+                    "googleSheetsApi": {
+                        "id": "SERVICE_ACCOUNT_CREDENTIAL_ID"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Schedule Trigger (Every 2h)": {
+                "main": [
+                    [
+                        {
+                            "node": "Read Target URLs from Sheets",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Read Target URLs from Sheets": {
+                "main": [
+                    [
+                        {
+                            "node": "Filter Chưa Comment",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Filter Chưa Comment": {
+                "main": [
+                    [
+                        {
+                            "node": "Loop Over Items",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Loop Over Items": {
+                "main": [
+                    [
+                        {
+                            "node": "Gemini AI - Soạn Comment",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gemini AI - Soạn Comment": {
+                "main": [
+                    [
+                        {
+                            "node": "Random Delay (30-120s)",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Random Delay (30-120s)": {
+                "main": [
+                    [
+                        {
+                            "node": "Post Comment to Facebook",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Post Comment to Facebook": {
+                "main": [
+                    [
+                        {
+                            "node": "Update Sheets - Đã comment",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Update Sheets - Đã comment": {
+                "main": [
+                    [
+                        {
+                            "node": "Loop Over Items",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "active": false,
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "id": "AUTO_COMMENT_OUTREACH_ID"
+    }
+]

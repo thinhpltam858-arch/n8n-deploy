@@ -1,0 +1,119 @@
+[
+    {
+        "name": "Tâm Thịnh - Messenger Lead Capture v2",
+        "nodes": [
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "id": "facebook-trigger",
+                "name": "Facebook Trigger",
+                "type": "n8n-nodes-base.facebookTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "string": [
+                            {
+                                "value1": "={{$json.message}}",
+                                "operation": "regex",
+                                "value2": ".*(tư vấn|học lái|đăng ký|bằng lái|giá).*|\\d{10}"
+                            }
+                        ]
+                    }
+                },
+                "id": "lead-filter",
+                "name": "Lead Filter",
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 1,
+                "position": [
+                    250,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "authentication": "serviceAccount",
+                    "operation": "append",
+                    "documentId": {
+                        "__rl": true,
+                        "mode": "id",
+                        "value": "1HdvoIB0fBMDoJZh47sBEqDQsnEBGsH7kB8J03RJXXqo"
+                    },
+                    "sheetName": "Leads",
+                    "options": {}
+                },
+                "id": "google-sheets",
+                "name": "Google Sheets",
+                "type": "n8n-nodes-base.googleSheets",
+                "typeVersion": 3,
+                "position": [
+                    500,
+                    -100
+                ],
+                "credentials": {
+                    "googleServiceAccountApi": {
+                        "id": "zQ9x8R2m6Lp1vK5n"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://webhook.site/placeholder-for-zalo",
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={\n  \"text\": \"🔥 KHÁCH HÀNG MỚI: \" + $json.sender.name + \" đang quan tâm: \" + $json.message\n}",
+                    "options": {}
+                },
+                "id": "zalo-notify",
+                "name": "Zalo Notification",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 3,
+                "position": [
+                    500,
+                    100
+                ]
+            }
+        ],
+        "connections": {
+            "Facebook Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Lead Filter",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Lead Filter": {
+                "main": [
+                    [
+                        {
+                            "node": "Google Sheets",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Zalo Notification",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "id": "L28UZXfEbgB6sc1ZwdW-g",
+        "active": true,
+        "settings": {
+            "executionOrder": "v1"
+        }
+    }
+]

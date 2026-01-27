@@ -1,0 +1,147 @@
+[
+    {
+        "updatedAt": "2026-01-19T22:03:55.966Z",
+        "createdAt": "2026-01-19T17:25:50.721Z",
+        "id": "J9JB5zKMKnykHIUTCb4L2",
+        "name": "Tâm Thịnh - Auto Post Content",
+        "description": null,
+        "active": true,
+        "isArchived": false,
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "hours",
+                                "interval": 6
+                            }
+                        ]
+                    }
+                },
+                "id": "c6b99322-5461-45bb-ab55-e638c6d3b29b",
+                "name": "Schedule Trigger",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "authentication": "serviceAccount",
+                    "documentId": {
+                        "__rl": true,
+                        "value": "1HdvoIB0fBMDoJZh47sBEqDQsnEBGsH7kB8J03RJXXqo",
+                        "mode": "id"
+                    },
+                    "sheetName": "Content",
+                    "options": {}
+                },
+                "id": "6bc7978a-bd73-4dfa-9d14-19900fb554fa",
+                "name": "Get Content from Sheet",
+                "type": "n8n-nodes-base.googleSheets",
+                "typeVersion": 3,
+                "position": [
+                    208,
+                    0
+                ],
+                "credentials": {
+                    "googleServiceAccountApi": {
+                        "id": "zQ9x8R2m6Lp1vK5n",
+                        "name": "Google Service Account API"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "httpRequestMethod": "POST",
+                    "edge": "feed",
+                    "options": {
+                        "queryParameters": {
+                            "parameter": [
+                                {
+                                    "name": "message",
+                                    "value": "={{ $json.Caption }}"
+                                },
+                                {
+                                    "name": "link",
+                                    "value": "={{ $json.ImageURL }}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.facebookGraphApi",
+                "typeVersion": 1,
+                "position": [
+                    448,
+                    0
+                ],
+                "id": "90d95053-0bce-47ea-8653-3f2df21b98de",
+                "name": "Facebook Graph API",
+                "credentials": {
+                    "facebookGraphApi": {
+                        "id": "gfPXpP5BXAjhAIk1",
+                        "name": "Facebook Graph account"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Schedule Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Get Content from Sheet",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Get Content from Sheet": {
+                "main": [
+                    [
+                        {
+                            "node": "Facebook Graph API",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": null,
+        "pinData": {},
+        "versionId": "7af42665-a91a-41ad-814e-4d1c50ee7928",
+        "activeVersionId": null,
+        "versionCounter": 6,
+        "triggerCount": 0,
+        "tags": [],
+        "shared": [
+            {
+                "updatedAt": "2026-01-19T17:25:50.789Z",
+                "createdAt": "2026-01-19T17:25:50.789Z",
+                "role": "workflow:owner",
+                "workflowId": "J9JB5zKMKnykHIUTCb4L2",
+                "projectId": "M6unwIQDnJ5Jrlxu",
+                "project": {
+                    "updatedAt": "2026-01-18T06:02:49.215Z",
+                    "createdAt": "2026-01-18T05:57:19.876Z",
+                    "id": "M6unwIQDnJ5Jrlxu",
+                    "name": "Admin Admin <admin@tamthinh.local>",
+                    "type": "personal",
+                    "icon": null,
+                    "description": null,
+                    "creatorId": "d9d2e4e0-08b2-4fdc-a93c-c0c906da2a77"
+                }
+            }
+        ]
+    }
+]

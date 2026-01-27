@@ -1,0 +1,104 @@
+[
+    {
+        "name": "Tâm Thịnh - AI Post Creator v2 (Skills Enhanced)",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "hours",
+                                "interval": 6
+                            }
+                        ]
+                    }
+                },
+                "id": "schedule-trigger",
+                "name": "Schedule Trigger",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "prompt": "# Vai trò & Nhiệm vụ\nBạn là Content Creator chuyên nghiệp của Trung tâm Đào tạo Lái xe Tâm Thịnh. Mục tiêu của bạn là tạo ra nội dung Facebook HẤP DẪN, GẦN GŨI khiến người đọc CẢM THẤY được quan tâm và muốn HÀNH ĐỘNG.\n\n# Marketing Psychology Framework\nBạn PHẢI áp dụng ít nhất 2-3 trong các nguyên tắc sau:\n\n1. **Mere Exposure Effect** - Làm quen dần với thương hiệu Tâm Thịnh\n2. **Social Proof** - \"Hàng ngàn học viên đã...\"\n3. **Loss Aversion** - \"Đừng để...\", \"Đừng bỏ lỡ...\"\n4. **IKEA Effect** - Nhấn mạnh \"quá trình\" và \"nỗ lực\" khi học lái\n5. **Authority Bias** - Thể hiện chuyên môn của Tâm Thịnh\n\n# Content Strategy (Chọn 1 trong các chủ đề)\n\n## Chủ đề A: Câu chuyện Cảm xúc\n- Kể về học viên thật (ẩn danh hóa): Từ lo sợ → Tự tin → Thành công\n- Áp dụng: Social Proof + IKEA Effect\n\n## Chủ đề B: Mẹo/Bí quyết Hữu ích\n- Chia sẻ 3 tips thực tế (lái xe an toàn, tiết kiệm xăng, luật mới)\n- Áp dụng: Authority Bias + Reciprocity (cho giá trị trước)\n\n## Chủ đề C: Behind-the-scenes\n- Một ngày tại sân tập Tâm Thịnh, sự tận tâm của thầy cô\n- Áp dụng: Mere Exposure + Authority\n\n## Chủ đề D: Thông điệp Động viên\n- \"Bằng lái trong tay, Tương lai rộng mở\"\n- Áp dụng: Loss Aversion (nhấn mạnh cơ hội mất đi nếu không có bằng)\n\n# Copywriting Structure (BẮT BUỘC)\n\n## 1. Hook (Dòng đầu tiên)\n- PHẢI thu hút, khơi gợi tò mò hoặc cảm xúc\n- Ví dụ:\n  * \"Bạn có biết? 8/10 người học lái sợ nhất điều gì không? 😰\"\n  * \"Hôm nay, một học viên của Tâm Thịnh đã khóc... nhưng là nước mắt hạnh phúc! 🥹\"\n  * \"3 điều thầy cô Tâm Thịnh KHÔNG BAO GIỜ nói với học viên... 🤫\"\n\n## 2. Body (Nội dung chính)\n- Kể câu chuyện / Chia sẻ giá trị\n- Ngắn gọn, súc tích (5-8 dòng)\n- Ngôn từ: Thân mật, gần gũi (\"Nhà mình\", \"Các bạn ơi\")\n- Icons: 🚗, 🛵, ✨, 💚, 🌟, 🎯\n\n## 3. Call-to-Action (Mềm mại)\n- KHÔNG rao bán thô thiển\n- Mời inbox để \"nhận tư vấn\", \"được hỗ trợ\"\n- Ví dụ:\n  * \"Inbox ngay cho Tâm Thịnh để được tư vấn chi tiết nhé! 💬\"\n  * \"Bạn nào đang phân vân, nhắn tin cho nhà mình để được giải đáp tận tình ạ! 🥰\"\n\n# Tone of Voice Guidelines\n- ✅ Ấm áp, chân thành, nhiệt tình\n- ✅ Như người bạn chia sẻ, không phải quảng cáo\n- ✅ Tạo cảm giác \"Tâm Thịnh quan tâm đến BẠN, không chỉ là khách hàng\"\n- ❌ Tránh: Hào nhoáng, phóng đại, ép buộc\n\n# Output Format\n```\n[Hook đầy cảm xúc]\n\n[Nội dung chính - câu chuyện/giá trị]\n\n[CTA mềm mại]\n\n#TâmThịnh #HọcLáiXe #BằngLáiA1 #BằngLáiB2\n```\n\n# Critical Rules\n- KHÔNG dùng lời dẫn như \"Đây là bài đăng...\"\n- CHỈ xuất nội dung bài đăng, sẵn sàng copy-paste lên Facebook\n- PHẢI áp dụng ít nhất 2 nguyên tắc Marketing Psychology\n- Độ dài: Tối đa 10 dòng (không kể hashtags)\n\nBây giờ, hãy tạo một bài đăng Facebook tuyệt vời!",
+                    "options": {}
+                },
+                "id": "gemini-ai",
+                "name": "Gemini AI Creator v2 Enhanced",
+                "type": "n8n-nodes-base.googlePalmApi",
+                "typeVersion": 1,
+                "position": [
+                    250,
+                    0
+                ],
+                "credentials": {
+                    "googlePalmApi": {
+                        "id": "uoq3we0wIvtAJqrD"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "httpRequestMethod": "POST",
+                    "edge": "feed",
+                    "options": {
+                        "queryParameters": {
+                            "parameter": [
+                                {
+                                    "name": "message",
+                                    "value": "={{ $json.text }}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.facebookGraphApi",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    0
+                ],
+                "id": "facebook-post",
+                "name": "Post to Facebook",
+                "credentials": {
+                    "facebookGraphApi": {
+                        "id": "gfPXpP5BXAjhAIk1"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Schedule Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Gemini AI Creator v2 Enhanced",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gemini AI Creator v2 Enhanced": {
+                "main": [
+                    [
+                        {
+                            "node": "Post to Facebook",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "active": true,
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "id": "J9JB5zKMKnykHIUTCb4L2"
+    }
+]

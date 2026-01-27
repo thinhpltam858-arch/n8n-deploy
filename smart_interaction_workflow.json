@@ -1,0 +1,97 @@
+[
+    {
+        "name": "Tâm Thịnh - Smart Response AI",
+        "nodes": [
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "id": "facebook-trigger",
+                "name": "Facebook Trigger",
+                "type": "n8n-nodes-base.facebookTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "prompt": "={{ 'Bạn là một trợ lý tư vấn nhiệt tình của trung tâm đào tạo lái xe Tâm Thịnh. Khách hàng vừa bình luận: \"' + $json.message + '\". Hãy soạn một câu trả lời ngắn gọn, thân thiện, mời họ inbox hoặc gọi hotline 09xx.xxx.xxx để được tư vấn kỹ hơn. Dùng nhiều icon dễ thương.' }}",
+                    "options": {}
+                },
+                "id": "gemini-ai",
+                "name": "Gemini AI",
+                "type": "n8n-nodes-base.googlePalmApi",
+                "typeVersion": 1,
+                "position": [
+                    250,
+                    0
+                ],
+                "credentials": {
+                    "googlePalmApi": {
+                        "id": "uoq3we0wIvtAJqrD"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "httpRequestMethod": "POST",
+                    "node": "={{ $node[\"Facebook Trigger\"].json[\"id\"] }}",
+                    "edge": "comments",
+                    "options": {
+                        "queryParameters": {
+                            "parameter": [
+                                {
+                                    "name": "message",
+                                    "value": "={{ $json.text }}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "id": "facebook-reply",
+                "name": "Reply on Facebook",
+                "type": "n8n-nodes-base.facebookGraphApi",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    0
+                ],
+                "credentials": {
+                    "facebookGraphApi": {
+                        "id": "gfPXpP5BXAjhAIk1"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "Facebook Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Gemini AI",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Gemini AI": {
+                "main": [
+                    [
+                        {
+                            "node": "Reply on Facebook",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "active": true,
+        "settings": {
+            "executionOrder": "v1"
+        }
+    }
+]

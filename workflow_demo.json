@@ -1,0 +1,136 @@
+[
+    {
+        "id": "J9JB5zKMKnykHIUTCb4L2",
+        "name": "Tâm Thịnh - Auto Post Content (Demo Mode)",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {},
+                "id": "manual-trigger",
+                "name": "When clicking Execute",
+                "type": "n8n-nodes-base.manualTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    -150
+                ]
+            },
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "hours",
+                                "interval": 6
+                            }
+                        ]
+                    }
+                },
+                "id": "c6b99322-5461-45bb-ab55-e638c6d3b29b",
+                "name": "Schedule Trigger",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1,
+                "position": [
+                    0,
+                    0
+                ]
+            },
+            {
+                "parameters": {
+                    "authentication": "serviceAccount",
+                    "documentId": {
+                        "__rl": true,
+                        "value": "1HdvoIB0fBMDoJZh47sBEqDQsnEBGsH7kB8J03RJXXqo",
+                        "mode": "id"
+                    },
+                    "sheetName": "Content",
+                    "options": {}
+                },
+                "id": "6bc7978a-bd73-4dfa-9d14-19900fb554fa",
+                "name": "Get Content from Sheet",
+                "type": "n8n-nodes-base.googleSheets",
+                "typeVersion": 3,
+                "position": [
+                    250,
+                    0
+                ],
+                "credentials": {
+                    "googleServiceAccountApi": {
+                        "id": "zQ9x8R2m6Lp1vK5n"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "httpRequestMethod": "POST",
+                    "edge": "feed",
+                    "options": {
+                        "queryParameters": {
+                            "parameter": [
+                                {
+                                    "name": "message",
+                                    "value": "={{ $json.Caption }} (Bài đăng thử nghiệm hệ thống n8n)"
+                                },
+                                {
+                                    "name": "link",
+                                    "value": "={{ $json.ImageURL }}"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "type": "n8n-nodes-base.facebookGraphApi",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    0
+                ],
+                "id": "90d95053-0bce-47ea-8653-3f2df21b98de",
+                "name": "Facebook Graph API",
+                "credentials": {
+                    "facebookGraphApi": {
+                        "id": "gfPXpP5BXAjhAIk1"
+                    }
+                }
+            }
+        ],
+        "connections": {
+            "When clicking Execute": {
+                "main": [
+                    [
+                        {
+                            "node": "Get Content from Sheet",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Schedule Trigger": {
+                "main": [
+                    [
+                        {
+                            "node": "Get Content from Sheet",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Get Content from Sheet": {
+                "main": [
+                    [
+                        {
+                            "node": "Facebook Graph API",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        }
+    }
+]
